@@ -1,4 +1,4 @@
-.PHONY: init up down restart logs run server tunnel dashboard set-telegram-webhook clean
+.PHONY: init up down restart logs server tunnel dashboard set-telegram-webhook clean
 
 # System Configurations
 APP_PORT = 8000
@@ -27,17 +27,13 @@ logs:
 	docker compose logs -f
 
 # --- 💻 Local Development (Non-Containerized) ---
-run:
-	@echo "Starting local CLI mock simulation..."
-	uv run python src/main.py
-
 server:
 	@echo "Starting FastAPI server on port $(APP_PORT)..."
-	uv run uvicorn src.main:app --host 0.0.0.0 --port $(APP_PORT) --reload
+	uv run uvicorn src.backend.main:app --host 0.0.0.0 --port $(APP_PORT) --reload
 
 dashboard:
 	@echo "Starting Streamlit administration dashboard..."
-	uv run streamlit run src/dashboard.py
+	uv run streamlit run src/frontend/app.py
 
 tunnel:
 	@echo "Starting localtunnel -> https://$(SUBDOMAIN).loca.lt"
@@ -56,8 +52,3 @@ clean:
 	rm -f requirements.txt
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
-
-# Runs the CLI loop locally for mock simulations & seeding
-run:
-	@echo "Starting local CLI mock simulation and database seeding..."
-	uv run python src/seeding.py

@@ -1,4 +1,3 @@
-# src/routes/webhook.py
 import json
 import time
 from fastapi import APIRouter, BackgroundTasks, Request, HTTPException, Depends

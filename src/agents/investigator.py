@@ -1,8 +1,7 @@
 import json
 from google.genai import types
 from src.config import get_gemini_client
-from src.skills.geofencing import verify_high_risk_location
-from src.skills.behavioral_search import search_known_scam_behaviors
+from src.agents.skills.behavioral_search import search_known_scam_behaviors
 
 def analyze_risk(event: dict) -> dict:
     """
@@ -14,14 +13,6 @@ def analyze_risk(event: dict) -> dict:
 
     tool_context = []
     event_str = json.dumps(event, ensure_ascii=False)
-    
-    if event.get("event_name") == "user_send_location" or "address" in event:
-        address = event.get("address", "")
-        latitude = event.get("latitude", "")
-        longitude = event.get("longitude", "")
-        if address:
-            is_risky_location = verify_high_risk_location(address, latitude, longitude)
-            tool_context.append(f"Output Công cụ Geofencing: Địa điểm rủi ro cao = {is_risky_location}")
         
     behavior_search_results = search_known_scam_behaviors(event_str)
     if behavior_search_results:

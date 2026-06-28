@@ -1,18 +1,14 @@
-import os
-import json
-import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize Database Schemes
+from src.backend.routes import admin
+from src.backend.routes import webhook
 from src.database import init_db
+
 init_db()
 
-# Import App Routers
-from src.routes import webhook, admin
-
 app = FastAPI(title="AI Grandchild - Decoupled Architecture Server")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

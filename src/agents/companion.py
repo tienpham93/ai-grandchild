@@ -1,4 +1,3 @@
-# src/agents/companion.py
 from google.genai import types
 from src.config import get_gemini_client
 

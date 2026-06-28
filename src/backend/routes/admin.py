@@ -57,7 +57,7 @@ def add_member(data: dict, db: Session = Depends(get_db)):
             name=data["name"],
             member_type=data["member_type"],
             member_role=data["member_role"],
-            bank_account=data.get("bank_account") 
+            bank_account=data.get("bank_account")
         )
         db.add(member)
         db.commit()
@@ -66,6 +66,25 @@ def add_member(data: dict, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=f"Database insertion failed: {e}")
+
+@router.put("/api/members/{chat_id}")
+def update_member(chat_id: str, data: dict, db: Session = Depends(get_db)):
+    member = db.query(Member).filter(Member.chat_id == chat_id).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Member credentials not found")
+    
+    member.member_type = data.get("member_type", member.member_type)
+    member.member_role = data.get("member_role", member.member_role)
+    member.name = data.get("name", member.name)
+    member.bank_account = data.get("bank_account", member.bank_account)
+    
+    try:
+        db.commit()
+        db.refresh(member)
+        return member
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Database update failed: {e}")
 
 @router.delete("/api/members/{chat_id}")
 def revoke_member(chat_id: str, db: Session = Depends(get_db)):
@@ -78,7 +97,6 @@ def revoke_member(chat_id: str, db: Session = Depends(get_db)):
 
 @router.get("/{filename}")
 def serve_verification_file(filename: str):
-    """Serves static files from root /static directory (e.g., domain verification)."""
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     file_path = os.path.join(base_dir, "static", filename)
     if os.path.isfile(file_path):
