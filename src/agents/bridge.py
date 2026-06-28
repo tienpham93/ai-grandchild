@@ -1,5 +1,6 @@
+import json
 from google.genai import types
-from src.config import client, MODEL_NAME
+from src.config import get_gemini_client
 
 def format_family_alert(event: dict, risk_analysis: dict) -> str:
     """
@@ -9,16 +10,18 @@ def format_family_alert(event: dict, risk_analysis: dict) -> str:
     if risk_analysis.get("risk_level") != "HIGH":
         return "No alert necessary."
         
+    client = get_gemini_client()
+    
     system_instruction = (
-        "You are the Bridge Agent. Your job is to draft an urgent but clear SMS alert "
-        "to a family member about a potential scam targeting their elderly relative. "
-        "Be concise, state the risk clearly, and suggest an immediate action."
+        "Bạn là Bridge Agent. Công việc của bạn là soạn thảo một tin nhắn SMS khẩn cấp nhưng rõ ràng "
+        "gửi cho một thành viên trong gia đình về một vụ lừa đảo tiềm năng nhắm vào người thân cao tuổi của họ. "
+        "Hãy cô đọng, nêu rõ rủi ro và đề xuất một hành động ngay lập tức."
     )
     
-    prompt = f"Event Details: {event}\nRisk Analysis: {risk_analysis}\nDraft the SMS alert."
+    prompt = f"Chi tiết sự kiện: {json.dumps(event, ensure_ascii=False)}\nPhân tích rủi ro: {json.dumps(risk_analysis, ensure_ascii=False)}\nSoạn thảo tin nhắn SMS cảnh báo."
 
     response = client.models.generate_content(
-        model=MODEL_NAME,
+        model='gemini-3.5-flash',
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=system_instruction

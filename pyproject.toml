@@ -5,11 +5,13 @@ description = "AI Grandchild - Protecting seniors from timeshare scams"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "google-genai>=0.2.0",
+    "google-genai",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
     "fastapi>=0.100.0",
-    "uvicorn>=0.30.0"
+    "uvicorn>=0.30.0",
+    "python-telegram-bot>=22.8",
+    "requests",
 ]
 
 [build-system]
