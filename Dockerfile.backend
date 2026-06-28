@@ -10,7 +10,7 @@ COPY pyproject.toml .
 RUN uv sync --no-cache
 
 # Copy root python helper files
-COPY config.py database.py pipeline.py ./
+COPY src/config.py src/database.py src/pipeline.py ./src/
 
 # Copy the src folder
 COPY src/ ./src/
