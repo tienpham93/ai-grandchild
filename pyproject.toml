@@ -2,7 +2,6 @@
 name = "ai-grandchild"
 version = "0.1.0"
 description = "AI Grandchild - Protecting seniors from timeshare scams"
-readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "google-genai",
@@ -12,6 +11,8 @@ dependencies = [
     "uvicorn>=0.30.0",
     "python-telegram-bot>=22.8",
     "requests",
+    "streamlit>=1.58.0",
+    "sqlalchemy>=2.0.51",
 ]
 
 [build-system]

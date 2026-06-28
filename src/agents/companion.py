@@ -2,80 +2,69 @@
 from google.genai import types
 from src.config import get_gemini_client
 
-def generate_companion_response(history: list[dict], risk_level: str) -> str:
+def generate_companion_response(history: list[dict], role: str, name: str, risk_level: str) -> str:
     """
-    Companion Agent: Warm, proactive digital grandchild.
-    Communicates in Southern Vietnamese. Maintains threat-aware memory of conversation.
+    Companion Agent: Speaks warm, protective Southern Vietnamese to Seniors.
     """
     client = get_gemini_client()
 
     system_instruction = (
-        "Bạn là 'AI Grandchild', một người cháu kỹ thuật số chu đáo, ấm áp và bảo vệ "
-        "dành cho người cao tuổi Việt Nam. Bạn nói bằng giọng miền Nam tự nhiên, kính trọng "
-        "(ví dụ: dùng 'ngoại', 'dạ', 'thưa'). "
-        "Mục tiêu của bạn là nhẹ nhàng hướng dẫn họ tránh xa các vụ lừa đảo mà không khiến họ cảm thấy bị coi thường. "
-        "Dựa vào lịch sử hội thoại trước đó để trả lời tự nhiên, trôi chảy và nhất quán. "
-        "Luôn thể hiện sự quan tâm trước tiên."
+        f"Bạn là 'AI Grandchild', người cháu ruột thân yêu đang chăm sóc và bảo vệ người thân của mình.\n"
+        f"Bạn đang nói chuyện trực tiếp với: {name} (Vai trò trong gia đình: {role}).\n"
+        "Hãy xưng hô đúng vai vế một cách kính trọng và tự nhiên bằng tiếng Việt miền Nam (ví dụ: dạ, thưa, ngoại, bố, mẹ).\n"
+        "Mục tiêu của bạn là bảo vệ họ khỏi bẫy lừa đảo (như sở hữu kỳ nghỉ/timeshare) một cách tinh tế, ấm áp, "
+        "thể hiện tình thương gia đình chân thành."
     )
 
-    # Format the memory into a conversation log for the prompt
     history_text = ""
-    for msg in history[:-1]:  # Exclude the latest user message to format it explicitly below
-        role_label = "Cháu" if msg["role"] == "model" else "Ngoại"
-        history_text += f"{role_label}: {msg['content']}\n"
+    for msg in history[:-1]:
+        label = "Cháu" if msg["role"] == "model" else role.capitalize()
+        history_text += f"{label}: {msg['content']}\n"
 
     latest_msg = history[-1]["content"] if history else ""
 
     prompt = (
-        f"Lịch sử cuộc trò chuyện trước đó:\n{history_text}\n"
-        f"Ngoại vừa gửi tin nhắn mới nhất: '{latest_msg}'\n"
-        f"Mức độ rủi ro hiện tại do Điều tra viên phân tích là: {risk_level}.\n"
-        "Hãy viết tin nhắn trả lời trực tiếp gửi cho ngoại."
+        f"Lịch sử hội thoại trước đây:\n{history_text}\n"
+        f"Tin nhắn mới nhất từ {role} ({name}): '{latest_msg}'\n"
+        f"Mức độ rủi ro hiện tại: {risk_level}.\n"
+        "Hãy tạo một tin nhắn phản hồi ấm áp và an toàn."
     )
 
     response = client.models.generate_content(
         model='gemini-3.5-flash',
         contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction
-        )
+        config=types.GenerateContentConfig(system_instruction=system_instruction)
     )
     return response.text
 
-def generate_family_response(history: list[dict]) -> str:
+def generate_family_response(history: list[dict], role: str, name: str) -> str:
     """
-    Companion Agent (Family Mode): Professional, reassuring helper for parents/children.
-    Identifies context changes to answer questions accurately.
+    Companion Agent (Family Mode): Sends professional, status-oriented helper updates to family members.
     """
     client = get_gemini_client()
 
     system_instruction = (
-        "Bạn là 'AI Grandchild', trợ lý bảo mật thông minh giúp gia đình giám sát và bảo vệ ông bà "
-        "khỏi các bẫy lừa đảo hợp đồng kỳ nghỉ (timeshare). Bạn đang nói chuyện với người nhà "
-        "(bố mẹ hoặc con cháu của người lớn tuổi). "
-        "Hãy trả lời một cách lễ phép, lịch sự, rõ ràng bằng tiếng Việt. "
-        "Dựa trên lịch sử trò chuyện được cung cấp để trả lời chính xác, tránh lặp lại hoặc trả lời lạc đề."
+        f"Bạn là 'AI Grandchild', trợ lý an ninh thông minh hỗ trợ gia đình bảo vệ người thân khỏi lừa đảo du lịch.\n"
+        f"Bạn đang nói chuyện trực tiếp với: {name} (Vai trò: {role}).\n"
+        "Hãy xưng hô lễ phép, lịch sự và cung cấp thông tin giám sát trung thực, rõ ràng."
     )
 
-    # Format family history
     history_text = ""
     for msg in history[:-1]:
-        role_label = "Trợ lý" if msg["role"] == "model" else "Người nhà"
-        history_text += f"{role_label}: {msg['content']}\n"
+        label = "Trợ lý" if msg["role"] == "model" else role.capitalize()
+        history_text += f"{label}: {msg['content']}\n"
 
     latest_msg = history[-1]["content"] if history else ""
 
     prompt = (
-        f"Lịch sử cuộc trò chuyện trước đó:\n{history_text}\n"
-        f"Người nhà vừa hỏi: '{latest_msg}'\n"
-        "Hãy viết tin nhắn trả lời phản hồi cho họ."
+        f"Lịch sử hội thoại:\n{history_text}\n"
+        f"Tin nhắn mới nhất từ {role}: '{latest_msg}'\n"
+        "Hãy phản hồi tin nhắn của họ một cách ngắn gọn, súc tích."
     )
 
     response = client.models.generate_content(
-        model='gemini-3.5-flash',
+        model='gemini-1.5-flash',
         contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction
-        )
+        config=types.GenerateContentConfig(system_instruction=system_instruction)
     )
     return response.text
