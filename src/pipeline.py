@@ -4,7 +4,7 @@ from telegram.error import TelegramError
 
 # Project Modules
 from src.config import get_telegram_bot_token
-from src.database import get_db, Member, ChatMessage
+from src.backend.database import get_db, Member, ChatMessage
 from src.agents.skills.anonymizer import scrub_pii
 from src.agents.investigator import analyze_risk
 from src.agents.companion import generate_companion_response, generate_family_response

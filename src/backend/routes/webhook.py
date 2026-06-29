@@ -4,7 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Request, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 # Project Modules
-from src.database import get_db, Member
+from src.backend.database import get_db, Member
 from src.pipeline import process_chat_event
 
 router = APIRouter()

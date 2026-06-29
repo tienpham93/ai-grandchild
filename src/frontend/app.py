@@ -2,8 +2,13 @@ import os
 import requests
 import streamlit as st
 from dotenv import load_dotenv
+from auth import check_auth
 
 load_dotenv()
+
+# --- Auth Guard - Login Page ---
+if not check_auth():
+    st.stop()
 
 # Determine backend URL dynamically (Docker network name or local fallback)
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")

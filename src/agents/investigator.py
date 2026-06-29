@@ -1,15 +1,19 @@
 import json
 from google.genai import types
 from src.config import get_gemini_client
+from src.backend.database import SessionLocal, AgentConfig # Use session to read config
 from src.agents.skills.behavioral_search import search_known_scam_behaviors
 
 def analyze_risk(event: dict) -> dict:
-    """
-    Investigator Agent: Cynical back-end fraud pattern analysis.
-    Uses skills to determine if the event is a scam.
-    """
-    
     client = get_gemini_client()
+
+    # Query system instruction from Database
+    db = SessionLocal()
+    try:
+        agent_cfg = db.query(AgentConfig).filter(AgentConfig.id == "investigator").first()
+        system_instruction = agent_cfg.system_prompt if agent_cfg else "Default analyzer prompt fallback"
+    finally:
+        db.close()
 
     tool_context = []
     event_str = json.dumps(event, ensure_ascii=False)
@@ -18,13 +22,6 @@ def analyze_risk(event: dict) -> dict:
     if behavior_search_results:
         tool_context.append(f"Output Tìm kiếm Hành vi: {behavior_search_results}")
     
-    system_instruction = (
-        "Bạn là Điều tra viên. Bạn hoài nghi và được đào tạo chuyên sâu trong việc phát hiện "
-        "các vụ lừa đảo du lịch và hợp đồng nghỉ dưỡng (ví dụ: đường dây 2.7 nghìn tỷ VND) tại Việt Nam. "
-        "Phân tích sự kiện và kết quả từ các công cụ được cung cấp. "
-        "Trả về một phản hồi JSON với: 'risk_level' (LOW, MEDIUM, HIGH) và 'reasoning' (giải thích ngắn gọn)."
-    )
-
     prompt_parts = [f"Sự kiện cần phân tích: {event_str}"]
     if tool_context:
         prompt_parts.append("\n".join(tool_context))
@@ -47,4 +44,4 @@ def analyze_risk(event: dict) -> dict:
         return json.loads(response_text)
     except Exception as e:
         print(f"Error parsing LLM output to JSON: {response.text} - Error: {e}")
-        return {"risk_level": "UNKNOWN", "reasoning": f"Failed to parse LLM output: {e}. Raw output: {response.text}"}
+        return {"risk_level": "UNKNOWN", "reasoning": f"Failed to parse LLM output: {e}"}

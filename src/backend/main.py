@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize Database Schemes
-from src.backend.routes import admin
+from src.backend.routes import adminService
+from src.backend.routes import agentService
+from src.backend.routes import accountService
 from src.backend.routes import webhook
-from src.database import init_db
+from src.backend.database import init_db
 
 init_db()
 
@@ -18,7 +20,9 @@ app.add_middleware(
 )
 
 # Mount Sub-routers
-app.include_router(admin.router)
+app.include_router(adminService.router)
+app.include_router(accountService.router)
+app.include_router(agentService.router)
 app.include_router(webhook.router)
 
 # --- CLI Local Simulation Support ---

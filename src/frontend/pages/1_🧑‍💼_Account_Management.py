@@ -1,7 +1,14 @@
 import os
+import sys
 import requests
 import streamlit as st
 import time
+
+# Resolve directory pathing to import auth correctly from parent folder
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from auth import check_auth
+if not check_auth():
+    st.stop()
 
 st.set_page_config(page_title="AI Grandchild - Account Management", page_icon="👥", layout="wide")
 
