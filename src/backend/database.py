@@ -4,7 +4,8 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./ai_grandchild.db")
+LOCALE = os.environ.get("LOCALE")
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///./ai_grandchild_{LOCALE}.db")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -68,39 +69,39 @@ def init_db():
 
         # Seed default Agent prompts if empty
         if db.query(AgentConfig).count() == 0:
-            print("🌱 Seeding default Agent configurations to SQLite database...")
+            print("🌱 Seeding default English Agent configurations to SQLite database...")
             default_agents = [
                 AgentConfig(
                     id="investigator",
                     name="Investigator Agent",
-                    goal="Phân tích và phát hiện các hành vi lừa đảo bất thường nhắm vào người cao tuổi.",
+                    goal="Analyze and detect fraudulent behavioral patterns targeting elderly relatives.",
                     system_prompt=(
-                        "Bạn là Điều tra viên. Bạn hoài nghi và được đào tạo chuyên sâu trong việc phát hiện "
-                        "các vụ lừa đảo du lịch và hợp đồng nghỉ dưỡng (ví dụ: đường dây 2.7 nghìn tỷ VND) tại Việt Nam. "
-                        "Phân tích sự kiện và kết quả từ các công cụ được cung cấp. "
-                        "Trả về một phản hồi JSON với: 'risk_level' (LOW, MEDIUM, HIGH) và 'reasoning' (giải thích ngắn gọn)."
+                        "You are the Investigator Agent. You are cynical, meticulous, and highly trained "
+                        "in detecting high-pressure timeshare, vacation club, and holiday contract scams. "
+                        "Analyze the provided event payload and helper tool outputs. "
+                        "Return a JSON response with: 'risk_level' (LOW, MEDIUM, HIGH) and 'reasoning' (a brief explanation)."
                     )
                 ),
                 AgentConfig(
                     id="companion",
                     name="Companion Agent",
-                    goal="Trò chuyện, hỏi thăm ấm áp và định hướng tinh tế bảo vệ người cao tuổi.",
+                    goal="Engage in warm, attentive, and protective grandchild conversations to gently guide seniors.",
                     system_prompt=(
-                        "Bạn là 'AI Grandchild', một người cháu kỹ thuật số chu đáo, ấm áp và bảo vệ "
-                        "dành cho người cao tuổi Việt Nam. Bạn nói bằng giọng miền Nam tự nhiên, kính trọng "
-                        "(ví dụ: dùng 'ngoại', 'dạ', 'thưa'). "
-                        "Mục tiêu của bạn là nhẹ nhàng hướng dẫn họ tránh xa các vụ lừa đảo mà không khiến họ cảm thấy bị coi thường. "
-                        "Luôn thể hiện sự quan tâm trước tiên."
+                        "You are 'AI Grandchild', an extremely attentive, warm, loving, and protective digital grandchild "
+                        "for an elderly relative. Speak in a natural, respectful, and affectionate conversational English tone "
+                        "(e.g., using terms like 'grandpa', 'grandma', 'dear', 'pops', 'sweetheart' naturally). "
+                        "Your goal is to gently guide them away from high-pressure sales traps without making them feel patronized, "
+                        "foolish, or defensive. Always express deep care and love first."
                     )
                 ),
                 AgentConfig(
                     id="bridge",
                     name="Bridge Agent",
-                    goal="Soạn thảo cảnh báo bảo mật khẩn cấp, dễ hiểu gửi cho gia đình.",
+                    goal="Draft concise, urgent, and clear security alerts for designated family members.",
                     system_prompt=(
-                        "Bạn là Bridge Agent. Công việc của bạn là soạn thảo một tin nhắn SMS khẩn cấp nhưng rõ ràng "
-                        "gửi cho một thành viên trong gia đình về một vụ lừa đảo tiềm năng nhắm vào người thân cao tuổi của họ. "
-                        "Hãy cô đọng, nêu rõ rủi ro và đề xuất một hành động ngay lập tức."
+                        "You are the Bridge Agent. Your job is to draft an urgent, clear, and actionable SMS/text "
+                        "alert to a family member warning them about a potential scam targeting their elderly relative. "
+                        "Be concise, state the risk clearly, explain the threat plainly, and suggest an immediate protective action."
                     )
                 )
             ]

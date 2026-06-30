@@ -20,9 +20,9 @@ def analyze_risk(event: dict) -> dict:
         
     behavior_search_results = search_known_scam_behaviors(event_str)
     if behavior_search_results:
-        tool_context.append(f"Output Tìm kiếm Hành vi: {behavior_search_results}")
+        tool_context.append(f"Output searh behavior: {behavior_search_results}")
     
-    prompt_parts = [f"Sự kiện cần phân tích: {event_str}"]
+    prompt_parts = [f"Events need to analyze: {event_str}"]
     if tool_context:
         prompt_parts.append("\n".join(tool_context))
 

@@ -1,7 +1,8 @@
+# src/agents/bridge.py
 import json
 from google.genai import types
 from src.config import get_gemini_client
-from src.backend.database import SessionLocal, AgentConfig # Use session to read config
+from src.database import SessionLocal, AgentConfig
 
 def format_family_alert(event: dict, risk_analysis: dict) -> str:
     if risk_analysis.get("risk_level") != "HIGH":
@@ -16,10 +17,14 @@ def format_family_alert(event: dict, risk_analysis: dict) -> str:
     finally:
         db.close()
     
-    prompt = f"Chi tiết sự kiện: {json.dumps(event, ensure_ascii=False)}\nPhân tích rủi ro: {json.dumps(risk_analysis, ensure_ascii=False)}\nSoạn thảo tin nhắn SMS cảnh báo."
+    prompt = (
+        f"Event details: {json.dumps(event, ensure_ascii=False)}\n"
+        f"Risk analysis: {json.dumps(risk_analysis, ensure_ascii=False)}\n"
+        "Draft the English SMS alert."
+    )
 
     response = client.models.generate_content(
-        model='gemini-3.5-flash',
+        model='gemini-1.5-flash',
         contents=prompt,
         config=types.GenerateContentConfig(system_instruction=system_instruction)
     )
