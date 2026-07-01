@@ -2,7 +2,7 @@
 import json
 from google.genai import types
 from src.config import get_gemini_client
-from src.database import SessionLocal, AgentConfig
+from src.backend.database import SessionLocal, AgentConfig
 
 def format_family_alert(event: dict, risk_analysis: dict) -> str:
     if risk_analysis.get("risk_level") != "HIGH":

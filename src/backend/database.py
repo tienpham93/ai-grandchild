@@ -3,13 +3,26 @@ import hashlib
 from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
-
-LOCALE = os.environ.get("LOCALE")
-DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///./ai_grandchild_{LOCALE}.db")
+from sqlalchemy import Boolean
+from src.shared.constant import DATABASE_URL
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+class AutomationJob(Base):
+    __tablename__ = "automation_jobs"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    job_type = Column(String, nullable=False)  # "inactivity_check", "scheduled_prompt", "family_digest"
+    family_id = Column(Integer, ForeignKey("families.id", ondelete="CASCADE"), nullable=False)
+    target_chat_id = Column(String, nullable=False)  # Senior's ID (or placeholder for family)
+    interval_minutes = Column(Integer, nullable=True) 
+    alert_family = Column(Boolean, default=False)     
+    cron_time = Column(String, nullable=True)        
+    cron_day_of_week = Column(String, nullable=True)  
+    is_active = Column(Boolean, default=True)
+    last_run = Column(DateTime, nullable=True)
 
 class AdminUser(Base):
     __tablename__ = "admin_users"

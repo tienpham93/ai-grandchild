@@ -1,16 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# Initialize Database Schemes
-from src.backend.routes import adminService
-from src.backend.routes import agentService
-from src.backend.routes import accountService
-from src.backend.routes import webhook
+from src.backend.routes import adminService, schedulerService, agentService, accountService, webhook
 from src.backend.database import init_db
+from contextlib import asynccontextmanager
+from src.backend.scheduler import start_scheduler, stop_scheduler
 
 init_db()
 
-app = FastAPI(title="AI Grandchild - Decoupled Architecture Server")
+# FastAPI Lifespan Handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup Events
+    start_scheduler()
+    yield
+    # Shutdown Events
+    stop_scheduler()
+
+app = FastAPI(title="AI Grandchild - Decoupled Architecture Server", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,6 +26,7 @@ app.add_middleware(
 )
 
 # Mount Sub-routers
+app.include_router(schedulerService.router)
 app.include_router(adminService.router)
 app.include_router(accountService.router)
 app.include_router(agentService.router)

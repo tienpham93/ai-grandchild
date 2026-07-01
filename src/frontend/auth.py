@@ -1,8 +1,5 @@
-import os
 import requests
 import streamlit as st
-
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
 
 def check_auth() -> bool:
     """
@@ -13,8 +10,6 @@ def check_auth() -> bool:
         st.session_state.logged_in = False
 
     if st.session_state.logged_in:
-        # User is authenticated, render a logout button at the bottom of the sidebar
-        st.sidebar.markdown("---")
         if st.sidebar.button("🚪 Log Out", use_container_width=True):
             st.session_state.logged_in = False
             st.rerun()

@@ -3,6 +3,7 @@ import requests
 import streamlit as st
 from dotenv import load_dotenv
 from auth import check_auth
+from src.shared.constant import BACKEND_URL
 
 load_dotenv()
 
@@ -10,8 +11,6 @@ load_dotenv()
 if not check_auth():
     st.stop()
 
-# Determine backend URL dynamically (Docker network name or local fallback)
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
 
 st.set_page_config(
     page_title="AI Grandchild - Control Center",
@@ -64,10 +63,3 @@ with col3:
         st.caption("Please add 'GEMINI_API_KEY' to your .env file.")
 
 st.write("---")
-
-st.subheader("👉 Getting Started")
-st.markdown(
-    "Use the **Sidebar Navigation** on the left to navigate between different administration pages:\n\n"
-    "1. **Account Management:** Organize family directories, manage whitelisted chat sessions, "
-    "assign helper roles, and link bank accounts."
-)

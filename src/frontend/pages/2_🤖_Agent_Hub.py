@@ -4,6 +4,8 @@ import requests
 import streamlit as st
 import time
 
+from src.shared.constant import BACKEND_URL
+
 # Resolve directory pathing to import auth correctly from parent folder
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from auth import check_auth
@@ -12,7 +14,6 @@ if not check_auth():
 
 st.set_page_config(page_title="AI Grandchild - Agents Portals", page_icon="🤖", layout="wide")
 
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
 
 st.header("🤖 Agents Management")
 
@@ -45,7 +46,7 @@ digraph G {
 st.write("---")
 
 # --- SECTION 2: AGENT SETTINGS ---
-st.subheader("⚙️ Agent Settings")
+st.subheader("🧰 Agent Settings")
 
 # API wrappers
 def fetch_agents():

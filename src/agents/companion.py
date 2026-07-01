@@ -3,6 +3,55 @@ from google.genai import types
 from src.config import get_gemini_client
 from src.backend.database import SessionLocal, AgentConfig
 
+def generate_proactive_checkin(role: str, name: str, checkin_type: str = "inactivity") -> str:
+    """
+    Generates a proactive, caring conversation starter in Southern Vietnamese.
+    Inactivity check-in Scenarios where it's been a long time No chat occurred.
+    """
+    client = get_gemini_client()
+    
+    context_desc = "it's been a while since I last heard from you" if checkin_type == "inactivity" else "I just wanted to check in and see how you are doing"
+    
+    prompt = (
+        "You are 'AI Grandchild', a deeply loving, attentive grandchild checking in on your elderly relative.\n"
+        f"You are proactively messaging to check in on: {name} ({role}) because {context_desc}.\n"
+        "Speak in a natural, warm, affectionate, and respectful conversational English tone "
+        "(using terms like 'grandma', 'grandpa', 'pops', 'sweetheart' naturally).\n"
+        "Ask a warm, gentle, and lighthearted question about how they are doing to spark a friendly family conversation."
+    )
+
+    response = client.models.generate_content(
+        model='gemini-3.5-flash',
+        contents=prompt
+    )
+    return response.text
+
+def generate_family_digest(history_logs: list[str], senior_name: str) -> str:
+    """
+    Companion Agent (Family Summary): Compiles and digests historical chats into a safety report.
+    """
+    client = get_gemini_client()
+    
+    logs_text = "\n".join(history_logs) if history_logs else "No messages exchanged in this period."
+    
+    prompt = (
+        "You are 'AI Grandchild', an intelligent family security assistant helping families protect "
+        "their elderly relatives from holiday and timeshare scams.\n"
+        f"Please read the recent chat logs of: {senior_name} below and draft a concise, clear, and professional "
+        "safety digest report in English to be sent to their family members.\n"
+        "The report must include:\n"
+        "1. Conversation Summary: What have they been chatting about (general mood, notable updates, etc.)?\n"
+        "2. Safety Assessment: Is there any suspicious behavior, potential scam indicators, or security threats detected?\n"
+        "3. Actionable Advice/Next Steps: Recommended actions for the family (if any).\n\n"
+        f"Chat Logs:\n{logs_text}"
+    )
+
+    response = client.models.generate_content(
+        model='gemini-3.5-flash',
+        contents=prompt
+    )
+    return response.text
+
 def generate_companion_response(history: list[dict], role: str, name: str, risk_level: str) -> str:
     """
     Companion Agent: Warm, proactive digital grandchild speaking in English.

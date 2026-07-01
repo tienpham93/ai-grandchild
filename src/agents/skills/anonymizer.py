@@ -30,6 +30,6 @@ def scrub_pii(data: dict) -> dict:
 
 if __name__ == "__main__":
     test_data = {
-        "text": "Senior number: 0912345678, Idenity card: 079012345678. Bank Account 123456789 ACB"
+        "text": "Senior number: 0912345678, Idenity card: 079012345678. Bank Account 123456789 NAB"
     }
     print(scrub_pii(test_data))
