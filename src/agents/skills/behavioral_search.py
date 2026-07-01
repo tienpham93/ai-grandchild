@@ -1,17 +1,37 @@
+SCAM_RULES = [
+    {
+        "must_have": ["free"],
+        "any_of": ["voucher", "vacation", "lunch"],
+        "signal": "Signal: Approach via 'free' vacation/lunch vouchers to lure elderly targets."
+    },
+    {
+        "must_have": ["grand hotel", "ballroom"],
+        "any_of": [],
+        "signal": "Signal: Hosting high-pressure sales presentations in rented high-end ballrooms."
+    },
+    {
+        "must_have": [],
+        "any_of": ["charge", "withdrawn", "transaction"],
+        "signal": "Signal: Large, sudden financial transaction occurs with no clear contract details."
+    }
+]
+
 def search_known_scam_behaviors(query: str) -> list[str]:
     """
-    Simulates a search for known scam behaviors based on the query.
-    In a real app, this would integrate with a knowledge base or external search API.
+    Evaluates typical behavioral triggers linked to timeshare rings and high-pressure sales
+    using a declarative, data-driven rules engine.
     """
-    
     query_lower = query.lower()
     signals = []
     
-    if "free" in query_lower and ("voucher" in query_lower or "vacation" in query_lower or "lunch" in query_lower):
-        signals.append("Signal: Approach via 'free' vacation/lunch vouchers to lure elderly targets.")
-    if "grand hotel" in query_lower and "ballroom" in query_lower:
-        signals.append("Signal: Hosting high-pressure sales presentations in rented high-end ballrooms.")
-    if "charge" in query_lower or "withdrawn" in query_lower or "transaction" in query_lower:
-        signals.append("Signal: Large, sudden financial transaction occurs with no clear contract details.")
+    for rule in SCAM_RULES:
+        # Check if ALL keywords in "must_have" are present
+        must_match = all(kw in query_lower for kw in rule["must_have"]) if rule["must_have"] else True
         
+        # Check if AT LEAST ONE keyword in "any_of" is present
+        any_match = any(kw in query_lower for kw in rule["any_of"]) if rule["any_of"] else True
+        
+        if must_match and any_match:
+            signals.append(rule["signal"])
+            
     return signals if signals else ["No explicit scam signatures detected."]

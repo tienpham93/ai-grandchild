@@ -1,5 +1,6 @@
 import requests
 import streamlit as st
+from src.shared.constant import BACKEND_URL
 
 def check_auth() -> bool:
     """
